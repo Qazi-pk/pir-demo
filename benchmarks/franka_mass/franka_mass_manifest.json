@@ -1,0 +1,63 @@
+{
+  "description": "Franka Panda mass matrix diagonal datasets",
+  "generator": "PyBullet",
+  "n_configurations": 2500,
+  "n_uniform": 2000,
+  "n_singular": 500,
+  "seed": 42,
+  "baseline_files": [
+    "benchmarks\\franka_mass\\franka_M11.csv",
+    "benchmarks\\franka_mass\\franka_M22.csv",
+    "benchmarks\\franka_mass\\franka_M33.csv",
+    "benchmarks\\franka_mass\\franka_M44.csv",
+    "benchmarks\\franka_mass\\franka_M55.csv",
+    "benchmarks\\franka_mass\\franka_M66.csv",
+    "benchmarks\\franka_mass\\franka_M77.csv"
+  ],
+  "perturbed_files": [
+    "benchmarks\\franka_mass\\franka_M11_payload.csv",
+    "benchmarks\\franka_mass\\franka_M22_payload.csv",
+    "benchmarks\\franka_mass\\franka_M33_payload.csv",
+    "benchmarks\\franka_mass\\franka_M44_payload.csv",
+    "benchmarks\\franka_mass\\franka_M55_payload.csv",
+    "benchmarks\\franka_mass\\franka_M66_payload.csv",
+    "benchmarks\\franka_mass\\franka_M77_payload.csv",
+    "benchmarks\\franka_mass\\franka_M11_rotor4.csv",
+    "benchmarks\\franka_mass\\franka_M22_rotor4.csv",
+    "benchmarks\\franka_mass\\franka_M33_rotor4.csv",
+    "benchmarks\\franka_mass\\franka_M44_rotor4.csv",
+    "benchmarks\\franka_mass\\franka_M55_rotor4.csv",
+    "benchmarks\\franka_mass\\franka_M66_rotor4.csv",
+    "benchmarks\\franka_mass\\franka_M77_rotor4.csv",
+    "benchmarks\\franka_mass\\franka_M11_link5mass.csv",
+    "benchmarks\\franka_mass\\franka_M22_link5mass.csv",
+    "benchmarks\\franka_mass\\franka_M33_link5mass.csv",
+    "benchmarks\\franka_mass\\franka_M44_link5mass.csv",
+    "benchmarks\\franka_mass\\franka_M55_link5mass.csv",
+    "benchmarks\\franka_mass\\franka_M66_link5mass.csv",
+    "benchmarks\\franka_mass\\franka_M77_link5mass.csv"
+  ],
+  "perturbations": [
+    "payload",
+    "rotor4",
+    "link5mass"
+  ],
+  "joint_columns": [
+    "q1",
+    "q2",
+    "q3",
+    "q4",
+    "q5",
+    "q6",
+    "q7"
+  ],
+  "output_columns": [
+    "M11",
+    "M22",
+    "M33",
+    "M44",
+    "M55",
+    "M66",
+    "M77"
+  ]
+}
