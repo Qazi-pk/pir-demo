@@ -20,7 +20,7 @@ sensitivity score (Δs).
 
 | Paper | DOI |
 |---|---|
-| PIR: Physics Intermediate Representation (v3.4) | [10.5281/zenodo.21231641](https://doi.org/10.5281/zenodo.21231641) |
+| PIR: Physics Intermediate Representation (v3.4.1) | [10.5281/zenodo.21351039](https://doi.org/10.5281/zenodo.21351039) |
 | PIR Architecture v3.1 | [10.5281/zenodo.19723561](https://doi.org/10.5281/zenodo.19723561) |
 | PIR-Bench v3.2 (gplearn head-to-head) | [10.5281/zenodo.20062682](https://doi.org/10.5281/zenodo.20062682) |
 | PIR-Bench v3.3 (Feynman Tier A blind) | [10.5281/zenodo.20195566](https://doi.org/10.5281/zenodo.20195566) |
