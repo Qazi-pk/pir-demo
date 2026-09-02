@@ -3,538 +3,69 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PIR — Physics Intermediate Representation</title>
-<meta name="description" content="A symbolic regression framework for the automated discovery of physical laws from noisy data. 100% discovery rate on PIR-Bench v3.1." />
-<meta property="og:title" content="PIR — Physics Intermediate Representation" />
-<meta property="og:description" content="Discovering symbolic physical laws from data. Optimal transport · JEPA priors · Langevin diffusion." />
-<meta property="og:type" content="website" />
-
+<title>PIR — Live Demo</title>
+<meta name="description" content="Try PIR's classical symbolic regression engine on your own data. Full results and papers at the PIR hub." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --paper:        #f4f0e6;
-    --paper-deep:   #ece7d8;
-    --ink:          #15171a;
-    --ink-soft:     #3b3f46;
-    --ink-faint:    #757a82;
-    --rule:         #1517190d;
-    --accent:       #4a2a1f;   /* oxblood / iron oxide */
-    --accent-soft:  #4a2a1f12;
-    --serif: "Instrument Serif", "Times New Roman", serif;
-    --sans:  "IBM Plex Sans", system-ui, sans-serif;
-    --mono:  "IBM Plex Mono", ui-monospace, monospace;
+  :root{
+    --ink-950:#14171b; --chalk:#e7e4da; --chalk-dim:#9aa1a6;
+    --amber:#c98a3b; --teal:#4fa8a0; --rule:rgba(231,228,218,0.12);
   }
-
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--sans);
-    font-weight: 400;
-    line-height: 1.55;
-    font-size: 17px;
-    /* Paper texture: faint repeating grid + grain */
-    background-image:
-      linear-gradient(var(--rule) 1px, transparent 1px),
-      linear-gradient(90deg, var(--rule) 1px, transparent 1px),
-      radial-gradient(circle at 20% 30%, #e9e2cf66 0, transparent 40%),
-      radial-gradient(circle at 80% 70%, #d8cfb866 0, transparent 50%);
-    background-size: 64px 64px, 64px 64px, 100% 100%, 100% 100%;
-    background-position: -1px -1px, -1px -1px, 0 0, 0 0;
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; display:flex; align-items:center;
+    background:var(--ink-950); color:var(--chalk);
+    font-family:"IBM Plex Sans", sans-serif; line-height:1.6;
   }
-
-  ::selection { background: var(--accent); color: var(--paper); }
-
-  a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--accent); transition: background 0.15s ease, color 0.15s ease; }
-  a:hover { background: var(--accent); color: var(--paper); }
-
-  .wrap { max-width: 980px; margin: 0 auto; padding: 0 28px; }
-
-  /* ---------- Top bar ---------- */
-  header.top {
-    border-bottom: 1px solid var(--ink);
-    padding: 18px 0;
-    background: var(--paper);
-    position: sticky; top: 0; z-index: 50;
-    backdrop-filter: saturate(1.1);
+  .wrap{max-width:640px; margin:0 auto; padding:48px 24px;}
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace; font-size:12px; letter-spacing:0.14em;
+    text-transform:uppercase; color:var(--teal); margin:0 0 16px;
   }
-  .top-inner { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; }
-  .mark {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 28px;
-    letter-spacing: -0.01em;
-    line-height: 1;
+  h1{
+    font-family:"Newsreader", serif; font-style:italic; font-weight:400;
+    font-size:clamp(28px, 5vw, 42px); line-height:1.2; margin:0 0 18px;
   }
-  .mark span { font-style: normal; font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; vertical-align: middle; margin-left: 10px; padding: 3px 8px; border: 1px solid var(--ink); }
-  nav.nav { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
-  nav.nav a { margin-left: 22px; border: none; }
-  nav.nav a:hover { background: transparent; color: var(--accent); }
-  @media (max-width: 640px) { nav.nav { display: none; } }
-
-  /* ---------- Hero ---------- */
-  section.hero { padding: 96px 0 80px; position: relative; }
-  .eyebrow {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    margin-bottom: 28px;
-    display: flex; align-items: center; gap: 14px;
+  p.sub{ color:var(--chalk-dim); font-size:16px; max-width:52ch; }
+  .box{
+    margin-top:8px; padding:14px 16px; border-left:2px solid var(--amber);
+    background:rgba(201,138,59,0.06); font-size:14px; color:var(--chalk-dim);
   }
-  .eyebrow::after { content: ""; flex: 1; height: 1px; background: var(--ink); opacity: 0.25; }
-
-  h1.title {
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: clamp(64px, 13vw, 168px);
-    line-height: 0.86;
-    letter-spacing: -0.035em;
-    margin: 0 0 28px;
+  .cta{display:flex; gap:14px; flex-wrap:wrap; margin-top:36px;}
+  .btn{
+    font-family:"IBM Plex Mono", monospace; font-size:13px; padding:12px 20px;
+    border:1px solid rgba(231,228,218,0.2); border-radius:2px;
+    color:var(--chalk); text-decoration:none;
   }
-  h1.title em { font-style: italic; color: var(--accent); }
-  .subtitle {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: clamp(22px, 3vw, 32px);
-    line-height: 1.25;
-    color: var(--ink-soft);
-    max-width: 32ch;
-    margin: 0 0 44px;
-  }
-
-  .stat-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    border-top: 1px solid var(--ink);
-    border-bottom: 1px solid var(--ink);
-    margin-top: 32px;
-  }
-  .stat {
-    padding: 22px 18px;
-    border-right: 1px solid var(--ink);
-  }
-  .stat:last-child { border-right: none; }
-  .stat .num {
-    font-family: var(--serif);
-    font-size: 44px;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    margin-bottom: 8px;
-  }
-  .stat .lbl {
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-  }
-  @media (max-width: 640px) {
-    .stat-row { grid-template-columns: 1fr; }
-    .stat { border-right: none; border-bottom: 1px solid var(--ink); }
-    .stat:last-child { border-bottom: none; }
-  }
-
-  /* ---------- Generic section ---------- */
-  section.block { padding: 88px 0; border-top: 1px solid var(--ink); }
-  .label {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    margin-bottom: 28px;
-  }
-  h2 {
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: clamp(36px, 5vw, 56px);
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    margin: 0 0 36px;
-    max-width: 22ch;
-  }
-  h2 em { color: var(--accent); }
-
-  .lede {
-    font-family: var(--serif);
-    font-size: clamp(20px, 2.4vw, 26px);
-    line-height: 1.45;
-    max-width: 38ch;
-    color: var(--ink-soft);
-    margin-bottom: 36px;
-  }
-
-  .cols {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 48px;
-  }
-  @media (max-width: 720px) { .cols { grid-template-columns: 1fr; gap: 28px; } }
-
-  .col h3 {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin: 0 0 12px;
-    font-weight: 500;
-  }
-  .col p { margin: 0 0 14px; color: var(--ink-soft); }
-
-  /* ---------- Results table ---------- */
-  .table-wrap { overflow-x: auto; }
-  table.results {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--mono);
-    font-size: 13px;
-  }
-  table.results th, table.results td {
-    text-align: left;
-    padding: 14px 14px;
-    border-bottom: 1px solid var(--rule);
-  }
-  table.results thead th {
-    font-size: 10.5px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    border-bottom: 1px solid var(--ink);
-    font-weight: 500;
-  }
-  table.results td.task { font-family: var(--sans); font-size: 14px; }
-  table.results td.dr { color: var(--accent); }
-  table.results tr:hover td { background: var(--accent-soft); }
-
-  .footnote {
-    margin-top: 22px;
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--ink-faint);
-    line-height: 1.6;
-  }
-
-  /* ---------- Demo callout ---------- */
-  .demo {
-    border: 1px solid var(--ink);
-    padding: 40px;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 32px;
-    background: var(--paper-deep);
-  }
-  .demo h3 { font-family: var(--serif); font-size: clamp(28px, 3.5vw, 40px); margin: 0 0 8px; font-weight: 400; }
-  .demo p { margin: 0; color: var(--ink-soft); max-width: 50ch; }
-  .btn {
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    padding: 16px 26px;
-    background: var(--ink);
-    color: var(--paper);
-    border: 1px solid var(--ink);
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-  .btn:hover { background: var(--accent); border-color: var(--accent); color: var(--paper); }
-  @media (max-width: 720px) {
-    .demo { grid-template-columns: 1fr; padding: 28px; }
-  }
-
-  /* ---------- Papers list ---------- */
-  ol.papers { list-style: none; padding: 0; margin: 0; }
-  ol.papers li {
-    display: grid;
-    grid-template-columns: 64px 1fr auto;
-    gap: 18px;
-    padding: 22px 0;
-    border-bottom: 1px solid var(--rule);
-    align-items: baseline;
-  }
-  ol.papers li:last-child { border-bottom: none; }
-  ol.papers .idx {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    color: var(--ink-faint);
-  }
-  ol.papers .ttl {
-    font-family: var(--serif);
-    font-size: 22px;
-    line-height: 1.25;
-  }
-  ol.papers .doi {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--ink-faint);
-    display: block;
-    margin-top: 6px;
-  }
-  ol.papers .doi a { border: none; color: var(--ink-faint); }
-  ol.papers .doi a:hover { background: transparent; color: var(--accent); }
-  ol.papers .meta {
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    white-space: nowrap;
-  }
-  @media (max-width: 640px) {
-    ol.papers li { grid-template-columns: 1fr; gap: 4px; }
-    ol.papers .meta { margin-top: 6px; }
-  }
-
-  /* ---------- Footer ---------- */
-  footer.foot {
-    border-top: 1px solid var(--ink);
-    padding: 56px 0 80px;
-  }
-  .foot-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 32px;
-  }
-  @media (max-width: 720px) { .foot-grid { grid-template-columns: 1fr; } }
-  .foot h4 {
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    margin: 0 0 14px;
-    font-weight: 500;
-  }
-  .foot p { margin: 0 0 8px; color: var(--ink-soft); }
-  .colophon {
-    margin-top: 56px;
-    padding-top: 22px;
-    border-top: 1px solid var(--rule);
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    color: var(--ink-faint);
-    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-  }
-
-  /* ---------- Small ornaments ---------- */
-  .glyph {
-    font-family: var(--serif);
-    font-style: italic;
-    color: var(--accent);
-    margin: 0 6px;
-  }
+  .btn.primary{background:var(--amber); border-color:var(--amber); color:#1a1206;}
+  .btn:hover{border-color:var(--chalk-dim);}
+  footer{margin-top:56px; font-size:13px; color:var(--chalk-dim);}
+  footer a{color:var(--teal);}
 </style>
 </head>
 <body>
+<div class="wrap">
+  <p class="eyebrow">PIR — Live Demo</p>
+  <h1>Submit your data. Get back the equation.</h1>
+  <p class="sub">This Space runs PIR's classical symbolic regression pipeline — log-linearization, dimensional scoring, RANSAC, and sparse regression. Upload tabular physics data and it returns the closed-form law behind it.</p>
 
-<header class="top">
-  <div class="wrap top-inner">
-    <a href="#top" class="mark" style="border:none;">
-      pir<span>v3.1</span>
-    </a>
-    <nav class="nav">
-      <a href="#about">About</a>
-      <a href="#results">Results</a>
-      <a href="#demo">Demo</a>
-      <a href="#papers">Papers</a>
-      <a href="#contact">Contact</a>
-    </nav>
+  <div class="box">
+    This demo previously referenced JEPA and Langevin diffusion components. A 2026 audit found those were never active in any published run — this Space now runs the classical pipeline only.
   </div>
-</header>
 
-<main id="top">
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="wrap">
-      <div class="eyebrow">Physics Intermediate Representation · est. 2026</div>
-      <h1 class="title">Laws,<br/><em>discovered.</em></h1>
-      <p class="subtitle">A framework for the automated discovery of symbolic physical laws from noisy data.</p>
-
-      <div class="stat-row">
-        <div class="stat">
-          <div class="num">100<span style="font-family:var(--mono);font-size:18px;vertical-align:super;">%</span></div>
-          <div class="lbl">Discovery rate · 20/20 tasks</div>
-        </div>
-        <div class="stat">
-          <div class="num">0.840</div>
-          <div class="lbl">Mean DCS · PIR-Bench v3.1</div>
-        </div>
-        <div class="stat">
-          <div class="num">88<span style="font-family:var(--mono);font-size:18px;color:var(--ink-faint);">/143</span></div>
-          <div class="lbl">SPARC galaxies flagged by Δs</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ABOUT -->
-  <section class="block" id="about">
-    <div class="wrap">
-      <div class="label">01 — What it is</div>
-      <h2>A search engine <em>for the laws</em> behind your data.</h2>
-      <p class="lede">PIR takes measurements and returns the closed-form expression that produced them — not a fitted curve, not a black box, but a symbolic law you can read, test, and publish.</p>
-
-      <div class="cols">
-        <div class="col">
-          <h3>Method</h3>
-          <p>Three pieces working together: an optimal-transport loss that compares distributions rather than points, JEPA-based latent priors learned from physical structure, and Langevin diffusion sampling over an expression grammar.</p>
-          <p>The result is a sampler that proposes physically plausible candidates and converges on the law that best reproduces the underlying distribution of the data.</p>
-        </div>
-        <div class="col">
-          <h3>What's new</h3>
-          <p>Two findings stand out. <strong>Over-diffusion</strong> — discovery rate is non-monotonic in Langevin steps, peaking sharply in a 500–750 window and degrading beyond, the first such curve reported for score-based symbolic generation.</p>
-          <p>And <strong>Δs</strong> — the score margin between the top two JEPA candidates flags hidden physics in real data, even when the surface-level fit looks perfect. On SPARC rotation curves, it identifies 61.5% of Kepler-failing galaxies.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RESULTS -->
-  <section class="block" id="results">
-    <div class="wrap">
-      <div class="label">02 — Benchmark</div>
-      <h2>PIR-Bench <em>v3.1</em></h2>
-      <p class="lede">Twenty canonical physics tasks. Five seeds each. Numbers below are headline results from the v3.1 release.</p>
-
-      <div class="table-wrap">
-      <table class="results">
-        <thead>
-          <tr>
-            <th>Task</th>
-            <th>Domain</th>
-            <th>DR</th>
-            <th>DCS</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td class="task">Newton's second law</td><td>Mechanics</td><td class="dr">100%</td><td>0.992</td></tr>
-          <tr><td class="task">Kepler's third law</td><td>Orbital</td><td class="dr">100%</td><td>0.847</td></tr>
-          <tr><td class="task">Gravity (3-variable)</td><td>Gravitation</td><td class="dr">100%</td><td>0.806</td></tr>
-          <tr><td class="task">Inverse-square acceleration</td><td>Gravitation</td><td class="dr">100%</td><td>0.974</td></tr>
-          <tr><td class="task">Pendulum period</td><td>Mechanics</td><td class="dr">100%</td><td>0.985</td></tr>
-          <tr><td class="task">Harmonic oscillator Hamiltonian</td><td>Mechanics</td><td class="dr">100%</td><td>0.999</td></tr>
-          <tr><td class="task">Planar robot forward kinematics</td><td>Robotics</td><td class="dr">100%</td><td>0.910</td></tr>
-          <tr><td class="task" style="color:var(--ink-faint);">+ 13 additional tasks</td><td colspan="3" style="color:var(--ink-faint);">see PIR-Bench v5 paper for full table</td></tr>
-        </tbody>
-      </table>
-      </div>
-      <p class="footnote">DR = discovery rate (exact symbolic recovery). DCS = discovery confidence score, soft-graded across structure, dimension, and numerical equivalence (2% tolerance). Aggregate: <strong>100% DR across all 20 tasks, mean DCS 0.840.</strong></p>
-    </div>
-  </section>
-
-  <!-- DEMO -->
-  <section class="block" id="demo">
-    <div class="wrap">
-      <div class="label">03 — Try it</div>
-      <h2>Upload data. <em>Get a law.</em></h2>
-      <div class="demo">
-        <div>
-          <h3>Live demo on Hugging Face</h3>
-          <p>Five tabs — upload your own CSV, talk to PhysicsGPT, browse worked examples, run the Langevin ablation, or read the papers. Eight built-in physics problems all recover the correct law live.</p>
-        </div>
-        <a class="btn" href="https://huggingface.co/spaces/Qazihanif/pir-jepa" target="_blank" rel="noopener">Open demo →</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- PAPERS -->
-  <section class="block" id="papers">
-    <div class="wrap">
-      <div class="label">04 — Papers</div>
-      <h2>Open. <em>Versioned.</em> On Zenodo.</h2>
-      <ol class="papers">
-        <li>
-          <span class="idx">2026 / 01</span>
-          <span>
-            <span class="ttl">PIR Architecture <em style="color:var(--accent);">v3.1</em></span>
-            <span class="doi"><a href="https://doi.org/10.5281/zenodo.19723561" target="_blank" rel="noopener">doi.org/10.5281/zenodo.19723561</a></span>
-          </span>
-          <span class="meta">Architecture</span>
-        </li>
-        <li>
-          <span class="idx">2026 / 02</span>
-          <span>
-            <span class="ttl">PIR-Bench <em style="color:var(--accent);">v5</em></span>
-            <span class="doi"><a href="https://doi.org/10.5281/zenodo.19477466" target="_blank" rel="noopener">doi.org/10.5281/zenodo.19477466</a></span>
-          </span>
-          <span class="meta">Benchmark</span>
-        </li>
-        <li>
-          <span class="idx">2026 / 03</span>
-          <span>
-            <span class="ttl">PIR-JEPA SPARC <em style="color:var(--accent);">v3</em></span>
-            <span class="doi"><a href="https://doi.org/10.5281/zenodo.19614469" target="_blank" rel="noopener">doi.org/10.5281/zenodo.19614469</a></span>
-          </span>
-          <span class="meta">Application</span>
-        </li>
-        <li>
-          <span class="idx">2026 / 04</span>
-          <span>
-            <span class="ttl">PIR-LIGO <em style="color:var(--accent);">v2</em></span>
-            <span class="doi"><a href="https://doi.org/10.5281/zenodo.19596888" target="_blank" rel="noopener">doi.org/10.5281/zenodo.19596888</a></span>
-          </span>
-          <span class="meta">Application</span>
-        </li>
-        <li>
-          <span class="idx">2026 / 05</span>
-          <span>
-            <span class="ttl">PIR-JEPA <em style="color:var(--accent);">v2</em></span>
-            <span class="doi"><a href="https://doi.org/10.5281/zenodo.19531598" target="_blank" rel="noopener">doi.org/10.5281/zenodo.19531598</a></span>
-          </span>
-          <span class="meta">Method</span>
-        </li>
-        <li>
-          <span class="idx">2026 / 06</span>
-          <span>
-            <span class="ttl">PhysicsGPT <em style="color:var(--accent);">v3</em></span>
-            <span class="doi"><a href="https://doi.org/10.5281/zenodo.19428391" target="_blank" rel="noopener">doi.org/10.5281/zenodo.19428391</a></span>
-          </span>
-          <span class="meta">Interface</span>
-        </li>
-      </ol>
-    </div>
-  </section>
-
-</main>
-
-<footer class="foot" id="contact">
-  <div class="wrap">
-    <div class="foot-grid">
-      <div>
-        <h4>About</h4>
-        <p>PIR is independent research by <strong>Qazi M. Hanif</strong>, building a framework for automated discovery of physical laws.</p>
-        <p style="color:var(--ink-faint); font-size: 14px;">Khyber Pakhtunkhwa, Pakistan <span class="glyph">·</span> est. 2026</p>
-      </div>
-      <div>
-        <h4>Code</h4>
-        <p><a href="https://github.com/qmhanif/pir-jepa" target="_blank" rel="noopener">github.com/qmhanif/pir-jepa</a></p>
-        <p><a href="https://huggingface.co/spaces/Qazihanif/pir-jepa" target="_blank" rel="noopener">huggingface.co/Qazihanif</a></p>
-      </div>
-      <div>
-        <h4>Contact</h4>
-        <p><a href="mailto:qmhanif70@gmail.com">qmhanif70@gmail.com</a></p>
-        <p style="color:var(--ink-faint); font-size: 14px;">For collaboration, endorsements, and benchmark integration.</p>
-      </div>
-    </div>
-    <div class="colophon">
-      <span>© 2026 Qazi M. Hanif <span class="glyph">·</span> Open licensed</span>
-      <span>Set in Instrument Serif &amp; IBM Plex</span>
-    </div>
+  <div class="cta">
+    <a class="btn primary" href="https://huggingface.co/spaces/Qazihanif/pir-demo">Open the demo →</a>
+    <a class="btn" href="https://qazi-pk.github.io/physics-engine/">Full results &amp; papers</a>
+    <a class="btn" href="https://github.com/Qazi-pk/physics-engine">Source code</a>
   </div>
-</footer>
 
+  <footer>
+    Verified results, method, and publication list live at the
+    <a href="https://qazi-pk.github.io/physics-engine/">PIR hub</a> —
+    this page is deliberately kept short so numbers only ever live in one place.
+  </footer>
+</div>
 </body>
 </html>
